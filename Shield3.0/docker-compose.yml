@@ -1,0 +1,42 @@
+services:
+  app:
+    build: .
+    ports:
+      - "8080:80"
+    environment:
+      APP_ENV: local
+      APP_URL: http://localhost:8080
+      DB_HOST: db
+      DB_PORT: 3306
+      DB_DATABASE: shield3
+      DB_USERNAME: shield
+      DB_PASSWORD: shield
+      JWT_SECRET: local-docker-secret-change-before-production
+      JWT_ISSUER: kenexoft-shield
+      JWT_TTL: 86400
+    depends_on:
+      - db
+    volumes:
+      - ./storage:/var/www/html/storage
+
+  db:
+    image: mysql:8.0
+    environment:
+      MYSQL_DATABASE: shield3
+      MYSQL_USER: shield
+      MYSQL_PASSWORD: shield
+      MYSQL_ROOT_PASSWORD: root
+    ports:
+      - "3307:3306"
+    volumes:
+      - db_data:/var/lib/mysql
+      - ./database/migrations/001_create_shield_schema.sql:/docker-entrypoint-initdb.d/01_create_shield_schema.sql:ro
+      - ./database/migrations/002_create_password_resets.sql:/docker-entrypoint-initdb.d/02_create_password_resets.sql:ro
+      - ./database/migrations/003_add_user_roles.sql:/docker-entrypoint-initdb.d/03_add_user_roles.sql:ro
+      - ./database/migrations/004_create_datasets.sql:/docker-entrypoint-initdb.d/04_create_datasets.sql:ro
+      - ./database/seeders/001_seed_reference_data.sql:/docker-entrypoint-initdb.d/05_seed_reference_data.sql:ro
+      - ./database/seeders/002_seed_super_admin.sql:/docker-entrypoint-initdb.d/06_seed_super_admin.sql:ro
+      - ./database/seeders/003_seed_datasets.sql:/docker-entrypoint-initdb.d/07_seed_datasets.sql:ro
+
+volumes:
+  db_data:

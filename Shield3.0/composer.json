@@ -1,0 +1,23 @@
+{
+  "name": "kenexoft/shield",
+  "description": "Production-ready PHP MVC REST API for Kenexoft SHIELD onboarding.",
+  "type": "project",
+  "require": {
+    "php": ">=8.2",
+    "ext-pdo": "*",
+    "ext-pdo_mysql": "*",
+    "ext-fileinfo": "*",
+    "ext-json": "*"
+  },
+  "autoload": {
+    "psr-4": {
+      "App\\": "app/"
+    }
+  },
+  "scripts": {
+    "lint": "php -l index.php"
+  },
+  "config": {
+    "sort-packages": true
+  }
+}

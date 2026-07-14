@@ -1,0 +1,292 @@
+openapi: 3.0.3
+info:
+  title: Kenexoft SHIELD API
+  version: 3.0.0
+  description: REST API for MSP, Company, and IT Consultant onboarding.
+servers:
+  - url: http://localhost/Shield3.0
+security:
+  - bearerAuth: []
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    ApiMessage:
+      type: object
+      properties:
+        success:
+          type: boolean
+        message:
+          type: string
+    LoginRequest:
+      type: object
+      required: [email, password, role]
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+        role:
+          type: string
+          enum: [SUBSCRIBER, SUPER_ADMIN]
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+        persona:
+          type: string
+          enum: [MSP, COMPANY, IT_CONSULTANT]
+        firstName:
+          type: string
+          nullable: true
+        lastName:
+          type: string
+          nullable: true
+        email:
+          type: string
+          format: email
+        mobile:
+          type: string
+        gstin:
+          type: string
+          nullable: true
+        status:
+          type: string
+          enum: [ACTIVE, INACTIVE, PENDING]
+        role:
+          type: string
+          enum: [SUBSCRIBER, SUPER_ADMIN]
+    Address:
+      type: object
+      required: [addressType, addressLine1, city, state, country, postalCode]
+      properties:
+        addressType:
+          type: string
+          enum: [REGISTERED_OFFICE, BRANCH, BILLING, SUBSCRIPTION]
+        addressLine1:
+          type: string
+        addressLine2:
+          type: string
+        landmark:
+          type: string
+        city:
+          type: string
+        state:
+          type: string
+        country:
+          type: string
+        postalCode:
+          type: string
+paths:
+  /api/csrf-token:
+    get:
+      security: []
+      summary: Issue CSRF token for browser writes
+      responses:
+        "200":
+          description: CSRF token
+  /api/auth/register:
+    post:
+      security: []
+      summary: Register an MSP, Company, or IT Consultant
+      parameters:
+        - in: header
+          name: X-CSRF-Token
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [persona, payload]
+              properties:
+                persona:
+                  type: string
+                  enum: [MSP, COMPANY]
+                payload:
+                  type: object
+          multipart/form-data:
+            schema:
+              type: object
+              required: [persona, payload, cv]
+              properties:
+                persona:
+                  type: string
+                  enum: [IT_CONSULTANT]
+                payload:
+                  type: string
+                  description: JSON encoded consultant registration payload.
+                cv:
+                  type: string
+                  format: binary
+      responses:
+        "201":
+          description: Registration completed
+        "419":
+          description: CSRF token failed
+        "422":
+          description: Validation failed
+  /api/auth/login:
+    post:
+      security: []
+      summary: Login and receive a JWT
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginRequest"
+      responses:
+        "200":
+          description: JWT token and user profile
+  /api/auth/logout:
+    post:
+      summary: Stateless logout audit event
+      responses:
+        "200":
+          description: Logout acknowledged
+  /api/users/me:
+    get:
+      summary: Get authenticated user
+      responses:
+        "200":
+          description: User profile
+    put:
+      summary: Update authenticated user profile
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/User"
+      responses:
+        "200":
+          description: User profile updated
+  /api/addresses:
+    get:
+      summary: List user addresses
+      responses:
+        "200":
+          description: Address list
+    post:
+      summary: Create address
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Address"
+      responses:
+        "201":
+          description: Address created
+  /api/addresses/{id}:
+    put:
+      summary: Update address
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Address updated
+    delete:
+      summary: Delete address
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Address deleted
+  /api/branches:
+    get:
+      summary: List company branches
+      responses:
+        "200":
+          description: Branch list
+    post:
+      summary: Create branch
+      responses:
+        "201":
+          description: Branch created
+  /api/branches/{id}:
+    put:
+      summary: Update branch
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Branch updated
+    delete:
+      summary: Delete branch
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Branch deleted
+  /api/services:
+    get:
+      summary: List MSP service catalog and selections
+      responses:
+        "200":
+          description: Service catalog
+    post:
+      summary: Replace MSP services
+      responses:
+        "200":
+          description: Services saved
+  /api/expertise:
+    get:
+      summary: List consultant expertise catalog and selections
+      responses:
+        "200":
+          description: Expertise catalog
+    post:
+      summary: Replace consultant expertise
+      responses:
+        "200":
+          description: Expertise saved
+  /api/consultant/cv:
+    get:
+      summary: Get consultant CV metadata
+      responses:
+        "200":
+          description: CV metadata
+    post:
+      summary: Upload or replace consultant CV
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [cv]
+              properties:
+                cv:
+                  type: string
+                  format: binary
+      responses:
+        "201":
+          description: CV uploaded
+    delete:
+      summary: Delete consultant CV
+      responses:
+        "200":
+          description: CV deleted

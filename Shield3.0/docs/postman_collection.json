@@ -1,0 +1,122 @@
+{
+  "info": {
+    "name": "Kenexoft SHIELD API",
+    "_postman_id": "8d59b322-6464-4b5f-9c21-shield30",
+    "description": "Postman collection for Kenexoft SHIELD PHP REST API.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost/Shield3.0" },
+    { "key": "csrfToken", "value": "" },
+    { "key": "jwt", "value": "" }
+  ],
+  "item": [
+    {
+      "name": "Get CSRF Token",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/api/csrf-token"
+      }
+    },
+    {
+      "name": "Register MSP",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "X-CSRF-Token", "value": "{{csrfToken}}" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\"persona\":\"MSP\",\"payload\":{\"mspName\":\"Apex CyberMSP\",\"businessName\":\"Apex Security Solutions Pvt Ltd\",\"website\":\"https://example.com\",\"contactEmail\":\"contact@example.com\",\"contactNumber\":\"9876543210\",\"gstin\":\"\",\"registeredAddress\":{\"addressLine1\":\"1 Main Road\",\"addressLine2\":\"\",\"landmark\":\"\",\"city\":\"Bengaluru\",\"state\":\"Karnataka\",\"country\":\"India\",\"postalCode\":\"560001\"},\"branches\":[],\"shieldLocationType\":\"registered_office\",\"subscriptionBranchId\":\"\",\"billingAddressType\":\"registered_office\",\"services\":[\"SOC Services\"],\"customServices\":\"\",\"security\":{\"password\":\"Password1!\",\"confirmPassword\":\"Password1!\"}}}"
+        },
+        "url": "{{baseUrl}}/api/auth/register"
+      }
+    },
+    {
+      "name": "Register IT Consultant With CV",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "X-CSRF-Token", "value": "{{csrfToken}}" }
+        ],
+        "body": {
+          "mode": "formdata",
+          "formdata": [
+            { "key": "persona", "value": "IT_CONSULTANT", "type": "text" },
+            {
+              "key": "payload",
+              "value": "{\"fullName\":\"Jane Smith\",\"email\":\"jane@example.com\",\"mobileNumber\":\"9876543210\",\"website\":\"\",\"linkedIn\":\"\",\"address\":{\"addressLine1\":\"1 Main Road\",\"addressLine2\":\"\",\"landmark\":\"\",\"city\":\"Bengaluru\",\"state\":\"Karnataka\",\"country\":\"India\",\"postalCode\":\"560001\"},\"expertise\":[\"Network Security\"],\"customExpertise\":\"\",\"gstin\":\"\",\"security\":{\"password\":\"Password1!\",\"confirmPassword\":\"Password1!\"}}",
+              "type": "text"
+            },
+            { "key": "cv", "type": "file", "src": "" }
+          ]
+        },
+        "url": "{{baseUrl}}/api/auth/register"
+      }
+    },
+    {
+      "name": "Login",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "X-CSRF-Token", "value": "{{csrfToken}}" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\"email\":\"contact@example.com\",\"password\":\"Password1!\",\"role\":\"SUBSCRIBER\"}"
+        },
+        "url": "{{baseUrl}}/api/auth/login"
+      }
+    },
+    {
+      "name": "Get Me",
+      "request": {
+        "method": "GET",
+        "header": [{ "key": "Authorization", "value": "Bearer {{jwt}}" }],
+        "url": "{{baseUrl}}/api/users/me"
+      }
+    },
+    {
+      "name": "List Addresses",
+      "request": {
+        "method": "GET",
+        "header": [{ "key": "Authorization", "value": "Bearer {{jwt}}" }],
+        "url": "{{baseUrl}}/api/addresses"
+      }
+    },
+    {
+      "name": "List Branches",
+      "request": {
+        "method": "GET",
+        "header": [{ "key": "Authorization", "value": "Bearer {{jwt}}" }],
+        "url": "{{baseUrl}}/api/branches"
+      }
+    },
+    {
+      "name": "List Services",
+      "request": {
+        "method": "GET",
+        "header": [{ "key": "Authorization", "value": "Bearer {{jwt}}" }],
+        "url": "{{baseUrl}}/api/services"
+      }
+    },
+    {
+      "name": "List Expertise",
+      "request": {
+        "method": "GET",
+        "header": [{ "key": "Authorization", "value": "Bearer {{jwt}}" }],
+        "url": "{{baseUrl}}/api/expertise"
+      }
+    },
+    {
+      "name": "Get Consultant CV",
+      "request": {
+        "method": "GET",
+        "header": [{ "key": "Authorization", "value": "Bearer {{jwt}}" }],
+        "url": "{{baseUrl}}/api/consultant/cv"
+      }
+    }
+  ]
+}
